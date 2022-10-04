@@ -1,2 +1,2 @@
-# mediacluster
+# Media Cluster
 Docker Media Cluster
