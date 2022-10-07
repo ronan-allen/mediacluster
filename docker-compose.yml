@@ -1,0 +1,193 @@
+version: "3.4"
+services:
+  ombi:
+    image: lscr.io/linuxserver/ombi:latest
+    container_name: ombi
+    environment:
+      - PUID=0
+      - PGID=0
+      - TZ=Australia/Melbourne
+    volumes:
+      - /opt/mediacluster/ombi/config:/config
+    ports:
+      - 12001:3579
+    restart: unless-stopped
+  overseerr:
+    image: sctx/overseerr:latest
+    container_name: overseerr
+    environment:
+      - PUID=0
+      - PGID=0
+      - TZ=Australia/Melbourne
+    ports:
+      - 12002:5055
+    volumes:
+      - /opt/mediacluster/overseer/config:/app/config
+    restart: unless-stopped
+  sonarr:
+    image: lscr.io/linuxserver/sonarr:latest
+    container_name: sonarr
+    environment:
+      - PUID=0
+      - PGID=0
+      - TZ=Australia/Melbourne
+    volumes:
+      - /opt/mediacluster/sonarr/config:/config
+      - /opt/mediacluster/media/tvshows:/tvshows
+      -  /opt/mediacluster/media/anime:/anime
+      - /opt/mediacluster/media/downloads:/downloads
+    ports:
+      - 12003:8989
+    restart: unless-stopped
+  radarr:
+    image: lscr.io/linuxserver/radarr:latest
+    container_name: radarr
+    environment:
+      - PUID=0
+      - PGID=0
+      - TZ=Australia/Melbourne
+    volumes:
+      - /opt/mediacluster/radarr/config:/config
+      - /opt/mediacluster/media/movies:/movies
+      - /opt/mediacluster/media/animemovies:/animemovies
+      - /opt/mediacluster/media/downloads:/downloads
+    ports:
+      - 12004:7878
+    restart: unless-stopped
+  lidarr:
+    image: lscr.io/linuxserver/lidarr:latest
+    container_name: lidarr
+    environment:
+      - PUID=0
+      - PGID=0
+      - TZ=Australia/Melbourne
+    volumes:
+      - /opt/mediacluster/lidarr/config:/config
+      - /opt/mediacluster/media/music:/music
+      - /opt/mediacluster/media/downloads:/downloads
+    ports:
+      - 12005:8686
+    restart: unless-stopped
+  bazarr:
+    image: lscr.io/linuxserver/bazarr:latest
+    container_name: bazarr
+    environment:
+      - PUID=0
+      - PGID=0
+      - TZ=Australia/Melbourne
+    volumes:
+      - /opt/mediacluster/bazarr/config:/config
+      - /opt/mediacluster/media/tvshows:/tv
+      - /opt/mediacluster/media/movies:/movies
+      - /opt/mediacluster/media/animemovies:/animemovies
+      - /opt/mediacluster/media/anime:/anime
+    ports:
+      - 12006:6767
+    restart: unless-stopped
+  jackett:
+    image: lscr.io/linuxserver/jackett:latest
+    container_name: jackett
+    environment:
+      - PUID=0
+      - PGID=0
+      - TZ=Australia/Melbourne
+      - AUTO_UPDATE=true
+    volumes:
+      - /opt/mediacluster/jackett/config:/config
+    ports:
+      - 12007:9117
+    restart: unless-stopped
+  qbittorrent:
+    image: lscr.io/linuxserver/qbittorrent:latest
+    container_name: qbittorrent
+    environment:
+      - TZ=Australia/Melbourne
+      - WEBUI_PORT=12008
+      - PUID=0
+      - PGID=0
+      - DOCKER_MODS=marzzzello/linuxserver-io-mod-qbit-matui
+    volumes:
+      - /opt/mediacluster/qbittorrent/config:/config
+      - /opt/mediacluster/media/downloads:/downloads
+    ports:
+      - 12008:12008
+      - 6881:6881
+      - 6881:6881/udp
+    restart: unless-stopped
+  kavita:
+    image: kizaing/kavita:latest
+    volumes:
+      - /opt/mediacluster/media:/media
+      - /opt/mediacluster/kavita/config:/kavita/config
+    ports:
+      - 12009:5000
+    restart: unless-stopped
+  emby:
+    image: lscr.io/linuxserver/emby:latest
+    container_name: emby
+    environment:
+      - PUID=0
+      - PGID=0
+      - TZ=Australia/Melbourne
+    volumes:
+      - /opt/mediacluster/emby/config:/config
+      - /opt/mediacluster/media/tvshows:/data/tv
+      - /opt/mediacluster/media/movies:/data/movies
+      - /opt/mediacluster/media/animemovies:/data/animemovies
+      - /opt/mediacluster/media/anime:/data/anime
+    ports:
+      - 12010:8096
+    restart: unless-stopped
+  tautulli:
+    image: lscr.io/linuxserver/tautulli:latest
+    container_name: tautulli
+    environment:
+      - PUID=0
+      - PGID=0
+      - TZ=Australia/Melbourne
+    volumes:
+      - /opt/mediacluster/tautulli/config:/config
+    ports:
+      - 12011:8181
+    restart: unless-stopped
+  deluge:
+    image: lscr.io/linuxserver/deluge:latest
+    container_name: deluge
+    environment:
+      - PUID=0
+      - PGID=0
+      - TZ=Australia/Melbourne
+      - DELUGE_LOGLEVEL=error
+    volumes:
+      - /opt/mediacluster/deluge/config:/config
+      - /opt/mediacluster/media/downloads:/downloads
+    ports:
+      - 12012:8112
+      - 6882:6881
+      - 6882:6881/udp
+    restart: unless-stopped
+  tdarr:
+    container_name: tdarr
+    image: ghcr.io/haveagitgat/tdarr:latest
+    restart: unless-stopped
+
+    ports:
+      - 8265:8265 # webUI port
+      - 8266:8266 # server port
+      - 8267:8267 # Internal node port
+      - 8268:8268 # Example extra node port
+    environment:
+      - TZ=Australia/Melbourne
+      - PUID=0
+      - PGID=0
+      - serverIP=172.16.5.101
+      - serverPort=8266
+      - webUIPort=8265
+      - internalNode=true
+      - nodeID=TN1
+    volumes:
+      - /opt/mediacluster/tdarr/server:/app/server
+      - /opt/mediacluster/tdarr/configs:/app/configs
+      - /opt/mediacluster/tdarr/logs:/app/logs
+      - /opt/mediacluster/media/:/media
+      - /transcode_cache:/temp
